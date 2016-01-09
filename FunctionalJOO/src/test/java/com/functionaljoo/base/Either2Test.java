@@ -33,43 +33,38 @@ public class Either2Test {
     }
 
     @Test
-    public void shouldReturnD() {
-        A a = new A();
-        String result = Either2.options(a.getB(), a.getC())
-                .foldOptional(l -> l, r -> r)
-                .orElse("D");
-        assertEquals("D", result);
+    public void testBimapShouldReturnMapR() {
+        Root root = new Root();
+        root.setLeft(null);
+        root.setRight("R");
+
+        String result = Either2.options(root.getLeft(), root.getRight())
+                .bimap(left -> "MapL", right -> "MapR")
+                .foldOptional(left -> left, right -> right)
+                .orElse("Else");
+
+        assertEquals("MapR", result);
     }
 
-    @Test
-    public void shouldReturnB() {
-        A a = new A();
-        a.setB("B");
-        String result = Either2.options(a.getB(), a.getC())
-                .foldOptional(l -> l, r -> r)
-                .orElse("D");
-        assertEquals("B", result);
-    }
+    static class Root {
 
-    static class A {
+        private String left;
+        private String right;
 
-        private String b;
-        private String c;
-
-        public String getB() {
-            return b;
+        public String getLeft() {
+            return left;
         }
 
-        public void setB(String b) {
-            this.b = b;
+        public void setLeft(String left) {
+            this.left = left;
         }
 
-        public String getC() {
-            return c;
+        public String getRight() {
+            return right;
         }
 
-        public void setC(String c) {
-            this.c = c;
+        public void setRight(String right) {
+            this.right = right;
         }
     }
 
