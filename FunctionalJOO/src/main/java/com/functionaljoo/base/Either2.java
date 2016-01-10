@@ -3,13 +3,12 @@ package com.functionaljoo.base;
 import com.functionaljoo.base.annotations.Beta;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import org.derive4j.ArgOption;
+import org.derive4j.Data;
 
 /**
- * EitherOptional define dois simples métodos options e fold. Ela tem o objetivo
- * de mixar as funcionalidades da classe java.util.Optional com a Either do fugue.
- *
- * Com ela podemos definir duas simples opções e aplicar uma transformação sobre
- * o resultado para retornar um valor comum.
+ * Missing new class name and Javadoc
  *
  * @author Renato
  *
@@ -17,33 +16,35 @@ import java.util.function.Function;
  * @param <R>
  */
 @Beta
-public class Either2<L, R> {
+@Data(arguments = ArgOption.checkedNotNull)
+public abstract class Either2<L, R> {
+
+    public abstract <X> X match(Supplier<X> nothing, Function<L, X> left, Function<R, X> right);
+  // implements all methods from primitives generated in Either2s and/or the match method
 
     private final L left;
     private final R right;
 
-    private Either2() {
+    Either2() {
         this.left = null;
         this.right = null;
     }
 
-    private Either2(L left, R right) {
-        this.left = left;
-        this.right = right;
-    }
-
-
-    public static <T, K> Either2<T, K> options(T left, K right) {
-        return new Either2(left, right);
+    public static <L, R> Optional<Either2<L, R>> options(L left, R right) {
+        if (left != null && right == null) {
+            return Optional.of(Either2s.left(left));
+        } else if (right != null) {
+            return Optional.of(Either2s.right(right));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public <V> Optional<V> foldOptional(final Function<? super L, V> ifLeft,
             final Function<? super R,  V> ifRight) {
-        Optional<L> oLeft = Optional.<L>ofNullable(left);
-        Optional<R> oRight = Optional.<R>ofNullable(right);
-        if (oLeft.isPresent()) {
+        if (left != null) {
             return Optional.ofNullable(ifLeft.apply((L) left));
-        } else if (oRight.isPresent()) {
+        } else if (right != null) {
             return Optional.ofNullable(ifRight.apply((R) right));
         } else {
             return Optional.empty();
@@ -53,42 +54,42 @@ public class Either2<L, R> {
     public <X,Y> Either2<X,Y> bimap(java.util.function.Function<? super L,? extends X> leftMapper,
                         java.util.function.Function<? super R,? extends Y> rightMapper) {
 
-        X x = null;
-        if (Optional.ofNullable(left).isPresent()) {
-            x = leftMapper.apply(left);
+        if (left != null) {
+            X x = leftMapper.apply(left);
+            return Either2s.left(x);
         }
 
-        Y y = null;
-        if (Optional.ofNullable(right).isPresent()) {
-            y = rightMapper.apply(right);
+        if (right != null) {
+            Y y = rightMapper.apply(right);
+            return Either2s.right(y);
         }
 
-        return new Either2<>(x, y);
+        return Either2s.nothing();
     }
 
     public <L, R> Either2<L, R> flatBimap(
             java.util.function.Function<? super L,? extends L> leftMapper,
             java.util.function.Function<? super R,? extends R> rightMapper) {
 
-         Optional<L> oLeft = Optional.<L>ofNullable((L) left);
-
-         L applyL = (L) left;
-
-         if (oLeft.isPresent()) {
-             applyL = leftMapper.apply((L) left);
+         if (left != null) {
+             // L applyL = (L) left;
+             L applyL = leftMapper.apply((L) left);
+             return Either2s.left(applyL);
          }
 
-         Optional<R> oRight = Optional.<R>ofNullable((R) right);
-         R applyR = (R) right;
 
-         if (oRight.isPresent()) {
-            applyR = rightMapper.apply((R) right);
+         if (right != null) {
+            // R applyR = (R) right;
+            R applyR = rightMapper.apply((R) right);
+            return Either2s.right(applyR);
          }
 
-        return new Either2<>(applyL, applyR);
+        return Either2s.nothing();
     }
 
-    public <V> V fold(final Function<? super L, V> ifLeft, final Function<? super R,  V> ifRight) {
+    public <V> V fold(final Function<? super L, V> ifLeft,
+            final Function<? super R,  V> ifRight,
+            Supplier<V> ifNothing) {
         Optional<L> oLeft = Optional.<L>ofNullable(left);
         Optional<R> oRight = Optional.<R>ofNullable(right);
         if (oLeft.isPresent()) {
@@ -96,15 +97,16 @@ public class Either2<L, R> {
         } else if (oRight.isPresent()) {
             return ifRight.apply((R) right);
         } else {
-            return null;
+            return ifNothing.get();
         }
     }
 
-    public L getLeft() {
-        return left;
+    public Optional<L> left() {
+        return Optional.ofNullable(left);
     }
 
-    public R getRight() {
-        return right;
+    public Optional<R> right() {
+        return Optional.ofNullable(right);
     }
+
 }

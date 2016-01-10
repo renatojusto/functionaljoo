@@ -61,14 +61,14 @@ public class EitherOptionalTest {
         // String result = EitherOr.of(1, "B").<String>toOptional().orElse("C");
         String a = null;
         String b = null;
-        String result2 = Either2.options(a, b)
-                .foldOptional(l -> l, r -> r)
-                .orElse("D");
-
-        String result3 = Either2.options(a, "R").fold(l -> l, r -> "D");
-
-        Either2.options(a, b)
-                .flatBimap(EitherOptionalTest::format, EitherOptionalTest::format);
+//        String result2 = Either2.options(a, b)
+//                .foldOptional(l -> l, r -> r)
+//                .orElse("D");
+//
+//        String result3 = Either2.options(a, "R").fold(l -> l, r -> "D");
+//
+//        Either2.options(a, b)
+//                .flatBimap(EitherOptionalTest::format, EitherOptionalTest::format);
 
 //        String result4 = Either2.options(a, "R")
 //                .flatMapRight(f -> "D")
@@ -76,8 +76,8 @@ public class EitherOptionalTest {
 //
 //        Optional.ofNullable("").flatMap(f -> "D");
 
-        assertEquals("D", result2);
-        assertEquals("D", result3);
+//        assertEquals("D", result2);
+//        assertEquals("D", result3);
     }
 
     public static String format(String v) {

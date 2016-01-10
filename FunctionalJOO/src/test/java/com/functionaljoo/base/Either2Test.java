@@ -1,5 +1,6 @@
 package com.functionaljoo.base;
 
+import java.util.function.Function;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -38,7 +39,11 @@ public class Either2Test {
         root.setLeft(null);
         root.setRight("R");
 
-        String result = Either2.options(root.getLeft(), root.getRight())
+        Either2<String, String> get = Either2.options(root.getLeft(), root.getRight()).get();
+
+        System.out.println(get.left());
+
+        String result = get
                 .bimap(left -> "MapL", right -> "MapR")
                 .foldOptional(left -> left, right -> right)
                 .orElse("Else");
