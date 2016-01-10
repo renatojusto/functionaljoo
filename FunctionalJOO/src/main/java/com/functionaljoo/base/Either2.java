@@ -52,7 +52,18 @@ public class Either2<L, R> {
 
     public <X,Y> Either2<X,Y> bimap(java.util.function.Function<? super L,? extends X> leftMapper,
                         java.util.function.Function<? super R,? extends Y> rightMapper) {
-        return new Either2<>(leftMapper.apply(left), rightMapper.apply(right));
+
+        X x = null;
+        if (Optional.ofNullable(left).isPresent()) {
+            x = leftMapper.apply(left);
+        }
+
+        Y y = null;
+        if (Optional.ofNullable(right).isPresent()) {
+            y = rightMapper.apply(right);
+        }
+
+        return new Either2<>(x, y);
     }
 
     public <L, R> Either2<L, R> flatBimap(
